@@ -5,8 +5,8 @@ A simple lightweight PHP Inversion of Control (IoC) container with the following
 - allow the creation of multiple or singleton instances
 - can bind to classes, methods and functions
 - resolve nested dependencies, based on constructor DI
-- can bind with optional argument 
-- detect cyclic dependencies on object creation
+- can bind with optional arguments
+- detect cyclic dependencies during the object creation phase
 - support for multiple, independent containers
 - easy to use
 
@@ -74,3 +74,5 @@ Ioc::bindSingleton(Configurations::class, function(string $path) {
 ```php
 Ioc::bindSingleton(Configurations::class, new Configurations("./config.json"));
 ```
+
+to be continued ...
