@@ -1,6 +1,6 @@
 # Pyther.Ioc
 
-A simple lightweight Inversion of Control (IoC) container with the following features:
+A simple lightweight PHP Inversion of Control (IoC) container with the following features:
 
 - allow the creation of multiple or singleton instances
 - can bind to classes, methods and functions
@@ -26,7 +26,7 @@ class MariaDatabase implements IDatabase
     }
 }
 ```
-
+and
 ```php
 class Configurations {
     function __construct(string $path)
