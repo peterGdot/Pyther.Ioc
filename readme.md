@@ -8,10 +8,11 @@ A simple lightweight PHP Inversion of Control (IoC) container with the following
 - can bind with optional arguments
 - detect cyclic dependencies during the object creation phase
 - support for multiple, independent containers
+- no external dependencies
 - easy to use
 
 ## Requirements
-- php 8.3 or higher
+- php 8.2 or higher
 
 ## Usage
 

@@ -109,7 +109,11 @@ class Binding {
             }
             // b) callable => return callable result
             else if (is_callable($this->implementation)) {
-                $refl = new \ReflectionFunction($this->implementation);
+                if (is_array($this->implementation)) {
+                    $refl = new \ReflectionMethod($this->implementation[0], $this->implementation[1]);
+                } else {
+                    $refl = new \ReflectionFunction($this->implementation);
+                }
                 $args = ParameterResolver::resolve($this->ioc, $refl->getParameters(), $this->overrides);
                 $this->object = call_user_func_array($this->implementation, $args);
             }
@@ -129,7 +133,6 @@ class Binding {
                 $this->object = $this->implementation;
             }
 
-            $this->isResolving = false;
             return $this->object;
         } catch (Exception $ex) {
             if ($this->fireExceptions) {
@@ -137,6 +140,8 @@ class Binding {
             } else {
                 return null;
             }
+        } finally {
+            $this->isResolving = false;
         }
     }
 }

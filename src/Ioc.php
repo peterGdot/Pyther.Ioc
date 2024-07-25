@@ -42,7 +42,11 @@ class Ioc {
 
     public static function get(string $name): ?object {
         return static::$default->resolve($name);    
-    }    
+    }
+
+    public static function has(string $name): bool {
+        return isset(static::$default->bindings[$name]);    
+    }
 
     #endregion
 
