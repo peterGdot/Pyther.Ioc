@@ -1,0 +1,19 @@
+{
+    "name": "pyther/ioc",
+    "description": "Inversion of Control Container",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Pyther\\Ioc\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Peter Grundmann",
+            "email": "peter.grundmann.de@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
