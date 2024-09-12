@@ -1,8 +1,7 @@
 <?php
 namespace Pyther\Ioc;
 
-use Exception;
-use Idm\PiperLink\Exceptions\ResolveException;
+use Pyther\Ioc\Exceptions\ResolveException;
 
 /**
     Syntax:
