@@ -12,7 +12,7 @@ A simple lightweight PHP Inversion of Control (IoC) container with the following
 - easy to use
 
 ## Requirements
-- php 8.2 or higher
+- php 8.1 or higher
 
 ## Usage
 

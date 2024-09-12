@@ -2,6 +2,7 @@
 namespace Pyther\Ioc;
 
 use Exception;
+use Idm\PiperLink\Exceptions\ResolveException;
 
 /**
     Syntax:
@@ -73,12 +74,12 @@ class Ioc {
     public function resolve(string $name): ?object {
         try {
             if (!isset($this->bindings[$name])) {
-                throw new Exception("Binding \"{$name}\" not found!");
+                throw new ResolveException("Binding \"{$name}\" not found!");
             }
             $binding = $this->bindings[$name];
             return $binding->resolve();
         } catch (\Exception $ex) {
-            throw new \Exception("Ioc: Can't resolve '$name' (".$ex->getMessage().")");
+            throw new ResolveException("Ioc: Can't resolve '$name' (".$ex->getMessage().")");
         }
     }
     

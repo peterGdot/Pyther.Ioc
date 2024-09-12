@@ -2,6 +2,10 @@
     "name": "pyther/ioc",
     "description": "Inversion of Control Container",
     "type": "library",
+    "keywords": [
+        "IoC",
+        "Inversion of Control"
+    ],
     "license": "MIT",
     "autoload": {
         "psr-4": {
@@ -16,6 +20,6 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php" : ">=8.2"
+        "php" : ">=8.1"
     }
 }
