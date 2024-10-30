@@ -35,6 +35,12 @@ Ioc::bindSingleton(IDatabase::class, MariaDatabase::class);
 $db = Ioc::get(IDatabase::class);
 ```
 
+## Why using an Ioc container
+
+An _IoC Container_ simplifies the creation of instances. It resolves object dependencies and is optimized to create instances on first use. It also makes it possible to replace classes with other (mock) implementations by changing one line of code. And it works perfectly with constructor dependency injections, forcing you to write cleaner code. It can also replace "global" collecton classes.
+
+In short, you define how instances are to be created, not when.
+
 ## Binding
 
 There are two general ways to bind implementations to the container.
