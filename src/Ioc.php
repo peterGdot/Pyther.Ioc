@@ -133,9 +133,6 @@ class Ioc
                 throw new ResolveException("Binding \"{$name}\" not found!");
             }
             $binding = $this->bindings[$name];
-            if ($args !== null && $binding->type === BindingType::Singleton) {
-                throw new ResolveException("Ioc get only allow the second argument for multiple bindings!");
-            }
             return $binding->resolve($args);
         } catch (\Exception $ex) {
             throw new ResolveException("Ioc: Can't resolve '$name' (".$ex->getMessage().")");

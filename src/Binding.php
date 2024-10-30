@@ -108,6 +108,11 @@ class Binding
             }
             $this->isResolving = true;
 
+            // resolve arguments only allowed for non singletons
+            if ($args !== null && $this->type === BindingType::Singleton) {
+                throw new ResolveException("Ioc get only allow the second argument for multiple bindings!");
+            }
+
             // if it's a singleton, resolve object only once
             if ($this->object !== null && $this->type === BindingType::Singleton) {
                 return $this->object;
