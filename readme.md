@@ -187,7 +187,7 @@ Ioc::get(Product::class, ["sku" => "Product 002"];
 
 ## Check if binding exists
 
-To check if a binding exists, you can use the `has`method:
+To check if a binding exists, you can use the `has` method:
 
 ```php
 $exists = Ioc::has(Configurations::class);
@@ -204,7 +204,7 @@ IoC::$default->addSingleton(...)
 IoC::$default->resolve(...)
 ```
 
-where Ioc::$default is the default container. This way you can have separated multiple containers:
+where `Ioc::$default` is the default container. This way you can have separated multiple containers:
 
 ```php
 $containerA = new Ioc();
