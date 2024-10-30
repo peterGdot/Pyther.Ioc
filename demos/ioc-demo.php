@@ -6,9 +6,6 @@ use Demo\MariaDatabase;
 use Demo\Person;
 use Pyther\Ioc\Ioc;
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 header("Content-Type: text/plain");
 
 $autoloader = require_once __DIR__."/../vendor/autoload.php";

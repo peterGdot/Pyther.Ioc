@@ -1,6 +1,9 @@
 <?php
 namespace Pyther\Ioc;
 
+/**
+ * Helper class to resolve constructor arguments
+ */
 abstract class ParameterResolver
 {
     /**
@@ -14,7 +17,8 @@ abstract class ParameterResolver
     public static function resolve(Ioc $ioc, array $parameters, array $overrides = []): array
     {
         $resolved = [];
-        foreach ($parameters as $parameter) {
+        foreach ($parameters as $parameter)
+        {
             $name = $parameter->getName();
             $type = $parameter->getType();
             

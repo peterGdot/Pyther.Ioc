@@ -4,7 +4,8 @@
     "type": "library",
     "keywords": [
         "IoC",
-        "Inversion of Control"
+        "Inversion of Control",
+        "Singleton"
     ],
     "license": "MIT",
     "autoload": {

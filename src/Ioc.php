@@ -4,25 +4,10 @@ namespace Pyther\Ioc;
 use Pyther\Ioc\Exceptions\ResolveException;
 
 /**
-    Syntax:
-    a = name | interface name | class name
-    b = class name | callable | null
-    c = class name | callable | null | object
-
-    // "default" container
-    IoC::$default->add(a, b, ... ctor args)
-    IoC::$default->addSingleton(a, c, ... ctor args)
-    IoC::$default->resolve(a) -> object | null
-
-    IoC::bind(a, b, ... ctor args) -> Ioc
-    IoC::bindSingleton(a, c, ... ctor args) -> Ioc
-    IoC::get(a) -> object | null
-
-    Ioc::auto()
-*/
-
-class Ioc {
-
+ * The "Inversion of Control" container.
+ */
+class Ioc
+{
     #region statics
 
     /**
@@ -32,19 +17,52 @@ class Ioc {
      */
     public static Ioc $default;
 
-    public static function bindMultiple(string $name, string|callable|null $implementation, array $args = []): static {
+    /**
+     * Add a new implementation to the container which can resolve to multiple instances. 
+     *
+     * @param string $name The name of the binding.
+     * @param string|callable|null $implementation Reference to the implementation or a construct method.
+     * @param array $args Optional constructor arguments.
+     * @return static Returns the container itself.
+     */
+    public static function bindMultiple(string $name, string|callable|null $implementation, array $args = []): static
+    {
         return static::$default->addMultiple($name, $implementation, $args);
     }
 
-    public static function bindSingleton(string $name, string|callable|null|object $implementation, array $args = []): static {
+    /**
+     * Add a new implementation to the container which act like a singleton. 
+     *
+     * @param string $name The name of the binding.
+     * @param string|callable|null $implementation Reference to the implementation or a construct method.
+     * @param array $args Optional constructor arguments.
+     * @return static Returns the container itself.
+     */
+    public static function bindSingleton(string $name, string|callable|null|object $implementation, array $args = []): static
+    {
         return static::$default->addSingleton($name, $implementation, $args);
     }
 
-    public static function get(string $name): ?object {
-        return static::$default->resolve($name);    
+    /**
+     * Resolve the binding.
+     *
+     * @param string $name The name of the binding.
+     * @param array|null $args Optional constructor arguments for "multiple" instances.
+     * @return object|null
+     */
+    public static function get(string $name, ?array $args = null): ?object
+    {
+        return static::$default->resolve($name, $args);    
     }
 
-    public static function has(string $name): bool {
+    /**
+     * Check if a binding exists.
+     *
+     * @param string $name The name of the binding.
+     * @return boolean
+     */
+    public static function has(string $name): bool
+    {
         return isset(static::$default->bindings[$name]);    
     }
 
@@ -52,36 +70,77 @@ class Ioc {
 
     private array $bindings = [];
 
-    public function addMultiple(string $name, string|callable|null $implementation, array $args = []): static {
+    /**
+     * Add a new implementation to the container which can resolve to multiple instances. 
+     *
+     * @param string $name The name of the binding.
+     * @param string|callable|null $implementation Reference to the implementation or a construct method.
+     * @param array $args Optional constructor arguments.
+     * @return static Returns the container itself.
+     */
+    public function addMultiple(string $name, string|callable|null $implementation, array $args = []): static
+    {
         $this->bindings[$name] = new Binding($this, $name, BindingType::Multiple, $implementation, $args);
         return $this;
     }
 
-    public function addSingleton(string $name, string|callable|null|object $implementation, array $args = []): static {
+    /**
+     * Add a new implementation to the container which act like a singleton. 
+     *
+     * @param string $name The name of the binding.
+     * @param string|callable|null $implementation Reference to the implementation or a construct method.
+     * @param array $args Optional constructor arguments.
+     * @return static Returns the container itself.
+     */
+    public function addSingleton(string $name, string|callable|null|object $implementation, array $args = []): static
+    {
         $this->bindings[$name] = new Binding($this, $name, BindingType::Singleton, $implementation, $args);
         return $this;
     }
 
-    public function hasBinding(string $name) {
+    /**
+     * Check if a binding exists.
+     *
+     * @param string $name The name of the binding.
+     * @return boolean
+     */
+    public function hasBinding(string $name)
+    {
         return isset($this->bindings[$name]);
     }
 
-    public function clear() {
+    /**
+     * Clear all bindings.
+     *
+     * @return void
+     */
+    public function clear()
+    {
         $this->bindings = [];
     }
 
-    public function resolve(string $name): ?object {
+    /**
+     * Resolve the binding.
+     *
+     * @param string $name The name of the binding.
+     * @param array|null $args Optional constructor arguments for "multiple" instances.
+     * @return object|null
+     */  
+    public function resolve(string $name, ?array $args = null): ?object
+    {
         try {
             if (!isset($this->bindings[$name])) {
                 throw new ResolveException("Binding \"{$name}\" not found!");
             }
             $binding = $this->bindings[$name];
-            return $binding->resolve();
+            if ($args !== null && $binding->type === BindingType::Singleton) {
+                throw new ResolveException("Ioc get only allow the second argument for multiple bindings!");
+            }
+            return $binding->resolve($args);
         } catch (\Exception $ex) {
             throw new ResolveException("Ioc: Can't resolve '$name' (".$ex->getMessage().")");
         }
     }
-    
 }
 
 Ioc::$default = new Ioc();
