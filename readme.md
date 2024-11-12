@@ -2,9 +2,10 @@
 
 A simple lightweight PHP Inversion of Control (IoC) container with the following features:
 
-- allow the creation of multiple or singleton instances
+- allow the creation of multiple or single(ton) instances
 - goes hand in hand with _Constructor Dependency Injection_
 - can bind to classes, methods, functions and instances
+- trigger autoloader only during resolve phase (lazy loading)
 - resolve nested dependencies, based on constructor DI
 - can bind with optional arguments
 - allow per instance arguments for non singletons during resolve phase
@@ -22,7 +23,7 @@ Install the [Composer Package](https://packagist.org/packages/pyther/ioc)
 
 `composer require pyther/ioc`
 
-And here is a fictional example. _Inversion of Control_ is a two way process. First you have to _bind_ implementations of interfaces or classes to the container and then _resolve_ (one or multile times) the creation of instances.  
+_Inversion of Control_ is a two way process. First you have to _bind_ or _register_ implementations of interfaces or classes to the container and then _resolve_ (one or multile times) the creation of instances. And here is a fictional example:
 
 ```php
 use Pyther\Ioc\Ioc;
@@ -37,13 +38,22 @@ $db = Ioc::get(IDatabase::class);
 
 ## Why using an Ioc container
 
-An _IoC Container_ simplifies the creation of instances. It resolves object dependencies and is optimized to create instances on first use. It also makes it possible to replace classes with other (mock) implementations by changing one line of code. And it works perfectly with constructor dependency injections, forcing you to write cleaner code. It can also replace "global" collection classes.
+An _IoC Container_ simplifies the creation of instances. It resolves object dependencies and is optimized to create instances on first use (lazy loading). It also makes it possible to replace classes with other (mock) implementations by changing one line of code. And it works perfectly with constructor dependency injections, forcing you to write cleaner code. It can also replace "global" collection classes.
 
 In short, you define how instances are to be created, not when.
 
 ## Binding
 
-There are two general ways to bind implementations to the container.
+There are two general ways to bind implementations to the container. 
+
+The full syntax is:
+
+```php
+bind[Singleton|Multiple](string name, string|callable|null implementation, array arguments = []) -> Ioc
+```
+
+The `name` is a unique name used later by the `get` method. The `implementation` must be a string (class name), any callable construction method, and existing object or null. `arguments` is an optional array of constructor arguments, indexed by argument name. These methods will return the Ioc container itself (usefull for chaining).
+
 
 ### BindSingleton
 ```php
@@ -61,9 +71,10 @@ Ioc::bindMultiple(Product::class, Product::class);
 This way any call of `Ioc::get(Product::class)` will return a new instance of the `Product` class.
 
 ## Dependency Injection
+
 A "Inversion of Control" container goes hand in hand with [Constructor Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection#Constructor_injection).
 
-Let's look at an example. Imagine we have a shopping cart, that depends of the current logged in customer:
+Let's look at an example. Imagine we have a shopping cart that depends of the current logged in customer:
 
 ```php
 class ShoppingCart
@@ -90,9 +101,9 @@ $cart = Ioc::get(ShoppingCart::class);
 ```
 
 the container want to create a new shopping cart and see it requires a customer class. 
-For this reason, a `Customer` instance is first created and passed as a parameter to the constructor of the ShoppingCart. 
-This nesting is recursive and takes into account “singletons” and “multiple” instances.
-Of course, multiple constructor arguments are supported and cyclic dependencies are recognized when resolving via the `get` method and will fire a `Pyther\Ioc\Exceptions\ResolveException` exception.
+For this reason, a `Customer` instance is first created (if not already done) and passed as a parameter to the constructor of the ShoppingCart. 
+This nesting is recursive and takes “singletons” and “multiple” instances into account.
+Of course, multiple constructor arguments are supported and cyclic dependencies are recognized when resolving via the `get` method and fires a `Pyther\Ioc\Exceptions\ResolveException` exception.
 
 ## More control
 This library gives you a lot control how objects will be instanced.
@@ -113,9 +124,9 @@ class Configurations
 Ioc::bindSingleton(Configurations::class, Configurations::class, ["path" => "./config.json"]);
 ```
 
-As you can see, the default values for constructors are taken into account if no arguments are found.
+As you can see, the default values for constructors are taken into account (if no arguments are found).
 
-Another way is to create a anonymous construct function: 
+Another way is to create an anonymous construct function: 
 
 ```php
 Ioc::bindSingleton(Configurations::class, function() {
@@ -161,13 +172,13 @@ $this->bindSingleton(IInterface::class, [$obj, "createObject"],  [
 ]);
 ```
 
-Auch ein binding auf null ist legitim:
+Binding to zero is also legitimate:
 
 ```php
 Ioc::bindSingleton(Configurations::class, null);
 ```
 
-In diesem Fall wird beim Auflösen keine Exception ausgelöst, sondern auf null aufgelöst.
+In this case, an exception is not thrown when resolving, but is resolved to zero.
 
 And finally you can also bind an already existing objects:
 
@@ -177,13 +188,20 @@ $configs = new Configurations("./config.json");
 Ioc::bindSingleton(Configurations::class, $configs);
 ```
 
-Although this is possible, it should be avoided. On the one hand, the creation of the instances should be left to the container, on the other hand this triggers the autoloader and executes code that may never be used. 
+Although this is possible, it should be avoided. On the one hand, the creation of the instances should be left to the container, on the other hand this triggers the autoloader and executes code that may never be needed. 
 
 ### More resolve control
 
 For non singleton instances you can specifiy constructor arguments during the _resolve_ phase:
 
 ```
+class Product
+{
+    public function __construct(string $sku) {
+        ...
+    }
+}
+...
 Ioc::bindMultiple(Product::class, Product::class);
 ...
 Ioc::get(Product::class, ["sku" => "Product 001"];
@@ -202,6 +220,7 @@ $exists = Ioc::has(Configurations::class);
 ## Multiple Containers
 
 If you have the rare case where you need more than one container, here we are.
+
 The static methods of `Ioc::bindSingleton(...)`, `Ioc::bindMultiple(...)` and `Ioc::get(...)` are suggar forms of
 
 ```php
