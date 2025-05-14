@@ -50,7 +50,12 @@ class Ioc
      * @param array|null $args Optional constructor arguments for "multiple" instances.
      * @return object|null
      */
-    public static function get(string $name, ?array $args = null): ?object
+    public static function getOptional(string $name, ?array $args = null): ?object
+    {
+        return static::$default->resolveOptional($name, $args);    
+    }
+
+    public static function get(string $name, ?array $args = null): object
     {
         return static::$default->resolve($name, $args);    
     }
@@ -119,14 +124,7 @@ class Ioc
         $this->bindings = [];
     }
 
-    /**
-     * Resolve the binding.
-     *
-     * @param string $name The name of the binding.
-     * @param array|null $args Optional constructor arguments for "multiple" instances.
-     * @return object|null
-     */  
-    public function resolve(string $name, ?array $args = null): ?object
+    public function resolve(string $name, ?array $args = null): object
     {
         try {
             if (!isset($this->bindings[$name])) {
@@ -136,6 +134,26 @@ class Ioc
             return $binding->resolve($args);
         } catch (\Exception $ex) {
             throw new ResolveException("Ioc: Can't resolve '$name' (".$ex->getMessage().")");
+        }
+    }
+
+    /**
+     * Resolve the binding.
+     *
+     * @param string $name The name of the binding.
+     * @param array|null $args Optional constructor arguments for "multiple" instances.
+     * @return object|null
+     */  
+    public function resolveOptional(string $name, ?array $args = null): ?object
+    {
+        try {
+            if (!isset($this->bindings[$name])) {
+                return null;
+            }
+            $binding = $this->bindings[$name];
+            return $binding->resolveOptional($args);
+        } catch (\Exception $ex) {
+            return null;
         }
     }
 }
